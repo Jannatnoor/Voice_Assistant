@@ -1,38 +1,73 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+body {
+  background-color:#463a3a; /* Set the background color you prefer */
+  color:aliceblue; /* Text color */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+  height: 100vh;
 }
 
-.App-link {
-  color: #61dafb;
+.disabled {
+  opacity: 0.5; /* Adjust the opacity to visually indicate that the button is disabled */
+  pointer-events: none; /* Prevent clicks on the button when disabled */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.app {
+  text-align: center;
+  padding: 20px;
+}
+
+.mic-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.mic-button {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+
+.listening {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    transform: scale(1.2);
   }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.response-container {
+  margin-top: 20px;
+}
+
+.response-container.animate .response {
+  animation: siri-animation 1.5s ease-in-out;
+}
+
+@keyframes siri-animation {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.5);
+  }
+}
+
+.response {
+  font-size: 1.2em;
+  color: #333;
+  margin-top: 10px;
 }

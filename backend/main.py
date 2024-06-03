@@ -7,86 +7,72 @@ import datetime
 import pyttsx3
 import pywhatkit
 import wikipedia
-
+import logging
+ 
 app = Flask(__name__)
-CORS(app)  # Add this line to enable CORS for your Flask app
-
-chatStr = ""
-
-def chat(query):
-    global chatStr
-    chatStr += f"Jannat: {query}\n Xabiar: "
-    return "I'm sorry, but I can't chat without OpenAI."
-
+CORS(app)  # Enable CORS for your Flask app
+ 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+ 
 listener = sr.Recognizer()
 engine = pyttsx3.init()
 voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)    
-
+engine.setProperty('voice', voices[1].id)
+ 
+# Flag to track whether the welcome message has been spoken
+welcome_spoken = False
+ 
 def say(text):
-    # Windows-specific command to speak text
-   os.system(f'PowerShell -Command "Add-Type –AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak(\'{text}\')"')
-
+    escaped_text = text.replace("'", "''")
+    os.system(f'PowerShell -Command "Add-Type –AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak(\'{escaped_text}\')"')
+ 
 def takeCommand():
+    query = ""
     try:
         with sr.Microphone() as source:
-            print('listening...')
+            logging.info('Listening...')
             voice = listener.listen(source)
             query = listener.recognize_google(voice)
             query = query.lower()
-            if 'Xabiar' in query:
-                query = query.replace('Xabiar', '')
-                print(query)
-    except:
-        pass
+            if 'xabiar' in query:
+                query = query.replace('xabiar', '')
+                logging.info(f"Recognized command: {query}")
+            else:
+                logging.info("Keyword 'xabiar' not found in query.")
+    except sr.RequestError as e:
+        logging.error(f"Could not request results from Google Speech Recognition service; {e}")
+    except sr.UnknownValueError:
+        logging.error("Google Speech Recognition could not understand audio")
+    except Exception as e:
+        logging.error(f"Error: {e}")
     return query
-
+ 
 def openSite(url):
     webbrowser.open(url)
-
-@app.route('/welcome', methods=['GET'])
-def handle_welcome():
-    welcomeMsg = 'Welcome to Xabiar AI. How can I help you?'
-    say(welcomeMsg)
-    return jsonify({'message': welcomeMsg})
-
-@app.route('/chat', methods=['POST'])
-def handle_chat():
-    data = request.get_json()
-    query = data['query']
-    response = chat(query)
-    return jsonify({'query': query, 'response': response})
-
-@app.route('/take-command', methods=['GET'])
-def handle_take_command():
-    query = takeCommand()
-    response = "How can I help you?"
-    
+ 
+def process_query(query):
+    logging.info(f"Processing query: {query}")
+    response = ""
     if 'play' in query:
         song = query.replace('play', '')
-        response = f"playing {song}"
+        response = f"Playing {song}"
         pywhatkit.playonyt(song)
-    
-    if "open youtube" in query.lower():
+    elif "open youtube" in query.lower():
         openSite("https://www.youtube.com/")
         response = "Opening YouTube"
     elif "open wikipedia" in query.lower():
         openSite("https://www.wikipedia.org/")
         response = "Opening Wikipedia"
-    
-    elif 'who is this' in query:
-        person = query.replace('who is this', '')
+    elif 'who is' in query:
+        person = query.replace('who is', '')
         info = wikipedia.summary(person, 1)
-        print(info)
-        say(info)
-            
+        response = info
     elif "open google" in query.lower():
         openSite("https://www.google.com/")
         response = "Opening Google"
-    
-            
     elif "open music" in query.lower():
-        musicPath = r"C:\Users\janna\Music\Playlists"  # Adjust this path to your music directory
+        musicPath = r"C:\Users\janna\Music\Playlists"
         os.system(f"start {musicPath}")
         response = "Opening Music"
     elif "open gmail" in query.lower():
@@ -102,12 +88,35 @@ def handle_take_command():
         strfTime = datetime.datetime.now().strftime("%H:%M")
         response = f"The time is {strfTime}"
     else:
-        response = query  # Return the original query if no specific command is recognized
-        
-    say(response)
-
+        response = "I can't reply, I am not ChatGPT."
+ 
+    return response
+ 
+@app.route('/welcome', methods=['GET'])
+def handle_welcome():
+    global welcome_spoken
+    welcomeMsg = 'Welcome to Xabiar AI. How can I help you?'
+    if not welcome_spoken:
+        say(welcomeMsg)
+        welcome_spoken = True
+    return jsonify({'message': welcomeMsg})
+ 
+@app.route('/chat', methods=['POST'])
+def handle_chat():
+    data = request.get_json()
+    query = data['query']
+    logging.info(f"/chat endpoint called with query: {query}")
+    response = process_query(query)
+    say(response)  # Say the response only once
     return jsonify({'query': query, 'response': response})
-
+ 
+@app.route('/take-command', methods=['GET'])
+def handle_take_command():
+    logging.info("/take-command endpoint called")
+    query = takeCommand()
+    response = process_query(query)
+    say(response)  # Say the response only once
+    return jsonify({'query': query, 'response': response})
+ 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
-    
