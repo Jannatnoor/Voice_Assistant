@@ -17,6 +17,7 @@ docopt==0.6.2
 Eel==0.16.0
 exceptiongroup==1.2.1
 Flask==3.0.3
+Flask-CORS==3.0.10
 fonttools==4.43.1
 future==1.0.0
 gevent==24.2.1
@@ -87,7 +88,7 @@ tzlocal==5.2
 urllib3==2.2.1
 Werkzeug==3.0.3
 whichcraft==0.6.1
-wikipedia==1.4.0
+wikipedia-api==0.5.4
 zipp==3.17.0
 zope.event==5.0
 zope.interface==6.3

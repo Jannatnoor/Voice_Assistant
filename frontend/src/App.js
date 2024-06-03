@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
 import microphoneImage from "./microphone.gif";
 import "./App.css";
 
@@ -34,7 +33,6 @@ function App() {
       setUserQuery(query);
       setResponse(res.data.response);
       console.log("Fetching chat response...");
-      //fetchChatResponse(query);  //// this was the culprit 😤😤😤
     } catch (error) {
       console.error("Error fetching speech recognition:", error);
     } finally {

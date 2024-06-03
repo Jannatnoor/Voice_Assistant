@@ -8,6 +8,7 @@ import pyttsx3
 import pywhatkit
 import wikipedia
 import logging
+
  
 app = Flask(__name__)
 CORS(app)  # Enable CORS for your Flask app
@@ -84,7 +85,7 @@ def process_query(query):
     elif "open vs code" in query.lower():
         os.system("code")
         response = "Opening Visual Studio Code"
-    elif "the time" in query.lower():
+    elif "What's the time" in query.lower():
         strfTime = datetime.datetime.now().strftime("%H:%M")
         response = f"The time is {strfTime}"
     else:
@@ -119,4 +120,4 @@ def handle_take_command():
     return jsonify({'query': query, 'response': response})
  
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='127.0.0.1', port=5000)
