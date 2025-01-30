@@ -11,7 +11,7 @@ import logging
 
  
 app = Flask(__name__)
-CORS(app)  # Enable CORS for your Flask app
+CORS(app, resources={r"/*": {"origins": "*"}})  # Enable CORS for your Flask app
  
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -120,4 +120,5 @@ def handle_take_command():
     return jsonify({'query': query, 'response': response})
  
 if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
