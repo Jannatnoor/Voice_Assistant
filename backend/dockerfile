@@ -1,0 +1,19 @@
+FROM python:3.11
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y espeak espeak-ng libespeak1
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files
+COPY . .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose port (Render provides $PORT)
+EXPOSE 5000
+
+# Start the Flask app
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "main:app"]
