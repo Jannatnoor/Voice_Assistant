@@ -8,6 +8,10 @@ import pyttsx3
 import pywhatkit
 import wikipedia
 import logging
+import sys
+
+if sys.platform == "win32":
+    import pywin32
 
  
 app = Flask(__name__)
